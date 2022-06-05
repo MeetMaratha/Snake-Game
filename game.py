@@ -1,52 +1,231 @@
 import numpy as np
 import pygame
 import sys
+import time
+from config import *
+
+
+def play_sound(name):
+        sound = pygame.mixer.Sound(f"resources/{name}.mp3")
+        pygame.mixer.Sound.play(sound)
 
 class Snake:
-    def __init__(self, bg_path, music_path, body_path, width, height):
+    def __init__(self, body_path, parent_screen, length):
+        self.length = length
+        self.body = pygame.transform.scale(pygame.image.load(body_path), BODY_SIZE)
+        self.x = [START_POS[0] for _ in range(self.length)]
+        self.y = [START_POS[1] - BODY_SIZE[0] * i for i in range(self.length)]
+        self.move = self.body.get_rect()[2]
+        self.parent_screen = parent_screen
+        self.direction = "DOWN"
+    
+    def draw(self, background, width, height, apple):
+        
+        self.parent_screen.blit(background, (0, 0))
+        for i in range(len(self.x)):
+            self.parent_screen.blit(self.body, (self.x[i], self.y[i]))
+        self.parent_screen.blit(apple.apple_image, (apple.x, apple.y))
+        pygame.display.flip()
+    
+    def moveLeft(self):
+        self.direction = "LEFT"
+    
+    def moveRight(self):
+        self.direction = "RIGHT"
+    
+    def moveUp(self):
+        self.direction = "UP"
+    
+    def moveDown(self):
+        self.direction = "DOWN"
+    
+    def _isOverlapping(self, new_x, new_y):
+        for i in range(self.length):
+            if self.x[i] == new_x and self.y[i] == new_y:
+                return True
+        return False
+        
+
+    def _isCrash(self, width, height, direction):
+        if direction == "LEFT":
+            if self.x[0] - self.move < 0: return True
+            elif self._isOverlapping(self.x[0] - self.move, self.y[0]) : return True
+            else : return False
+        
+        elif direction == "RIGHT":
+            if self.x[0] + 2*self.move > width : return True
+            elif self._isOverlapping(self.x[0] + self.move, self.y[0]) : return True
+            else : return False
+            
+        elif direction == "UP":
+            if self.y[0] - self.move < 0: return True
+            elif self._isOverlapping(self.x[0], self.y[0] - self.move) : return True 
+            else : return False
+        
+        elif direction == "DOWN":
+            if self.y[0] + 2*self.move > height : return True
+            elif self._isOverlapping(self.x[0], self.y[0] + self.move) : return True
+            else : return False
+        
+        else : return False
+
+        
+    def walk(self, background, width, height, apple):
+        if self._isCrash(width, height, self.direction):
+            self.displayGameOver()
+            play_sound("crash")
+            time.sleep(2)
+            pygame.quit()
+            sys.exit()
+        
+        for i in range(self.length - 1, 0, -1):
+            self.x[i] = self.x[i - 1]
+            self.y[i] = self.y[i - 1]
+        
+        if self.direction == 'LEFT':
+            self.x[0] -= self.move
+        
+        if self.direction == 'RIGHT':
+            self.x[0] += self.move
+        
+        if self.direction == "UP":
+            self.y[0] -= self.move
+        
+        if self.direction == "DOWN":
+            self.y[0] += self.move
+        
+
+        self.draw(background, width, height, apple)
+
+    def getNewCoords(self):
+        if self.direction == "DOWN":
+            self.x.append(self.x[-1])
+            self.y.append(self.y[-1] - BODY_SIZE[0] * self.length)
+        elif self.direction == "UP":
+            self.x.append(self.x[-1])
+            self.y.append(self.y[-1] + BODY_SIZE[0] * self.length)
+        elif self.direction == "LEFT":
+            self.x.append(self.x[-1] - BODY_SIZE[0] * self.length)
+            self.y.append(self.y[-1])
+        elif self.direction == "RIGHT":
+            self.x.append(self.x[-1] + BODY_SIZE[0] * self.length)
+            self.y.append(self.y[-1])
+
+    def displayGameOver(self):
+        font = pygame.font.SysFont('arial', 50)
+        game_over = font.render(f"Game Over", True, (255, 0, 0))
+        self.parent_screen.fill((0, 0, 0))
+        self.parent_screen.blit(game_over, (SCREEN_WIDTH // 3, SCREEN_HEIGHT // 2))
+        pygame.display.flip()        
+            
+
+class Apple:
+    def __init__(self, apple_path, screen, snake):
+        self.apple_image = pygame.transform.scale(pygame.image.load(apple_path).convert(), BODY_SIZE)
+        self.parent_screen = screen
+        self.x, self.y = self.getCoords(snake)
+
+    def getCoords(self, snake):
+        x = APPLE_SIZE[0] * np.random.randint(N_WIDTH)
+        y = APPLE_SIZE[1] * np.random.randint(N_HEIGHT)
+        while self.appleInSnake(x, y, snake):
+            x = APPLE_SIZE[0] * np.random.randint(N_WIDTH)
+            y = APPLE_SIZE[1] * np.random.randint(N_HEIGHT)
+        return x, y
+    
+    def appleInSnake(self, x, y, snake):
+        for i in range(snake.length):
+            if snake.x[i] == x and snake.y[i] == y : return True
+        return False
+
+    def changeCoords(self, snake):
+        self.x, self.y = self.getCoords(snake)
+    
+    def draw(self):
+        self.parent_screen.blit(self.apple_image, (self.x, self.y))
+
+
+
+
+class Game:
+    def __init__(self, bg_path, music_path, body_path, apple_path, width, height, length):
         pygame.init()
-        self.background = pygame.image.load(bg_path)
-        self.width = width
-        self.height = height
-        self.music = pygame.mixer.music.load(music_path)
-        self.body = pygame.image.load(body_path)
-        self.body_position = [np.random.randint(self.width), np.random.randint(self.height)]
-        self.move = self.body.get_rect()[3]
+        pygame.mixer.init()
+        self.screen = pygame.display.set_mode((width, height))
+        self.background = pygame.image.load(bg_path).convert()
+        self.snake = Snake(body_path, self.screen, length)
+        self.apple = Apple(apple_path, self.screen, self.snake)
+        self.width, self.height = width, height
+        pygame.mixer.music.load(music_path)
+        pygame.mixer.music.play(-1)
 
     def run(self):
-        screen = pygame.display.set_mode((self.width, self.height))
         pygame.display.set_caption('Snake')
         running = True
         pygame.mixer.music.play(-1)
+        self.snake.draw(self.background, self.width, self.height, self.apple)
         while running:
-            screen.blit(self.background, (0, 0))
-            screen.blit(self.body, self.body_position)
-            pygame.display.flip()
             for event in pygame.event.get():
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_UP:
-                        if self.body_position[1] - self.move > 0 : self.body_position[1] -= self.move
-                        else : self.body_position[1] = self.height - self.move 
+                        self.snake.moveUp()
                     if event.key == pygame.K_DOWN:
-                        if self.body_position[1] + self.move < self.height : self.body_position[1] += self.move
-                        else : self.body_position[1] = 0
+                        self.snake.moveDown()
                     if event.key == pygame.K_LEFT:
-                        if self.body_position[0] - self.move > 0 : self.body_position[0] -= self.move
-                        else : self.body_position[0] = self.width - self.move
+                        self.snake.moveLeft()
                     if event.key == pygame.K_RIGHT:
-                        if self.body_position[0] + self.move < self.width : self.body_position[0] += self.move
-                        else : self.body_position[0] = 0
+                        self.snake.moveRight()
                 if event.type == pygame.QUIT:
-                    # sys.exit()
                     pygame.quit()
                     running = False
+                    sys.exit()
+            
+            if self._isEaten():
+                play_sound("ding")
+                self.eaten()
+            self.snake.walk(self.background, self.width, self.height, self.apple)
+            self.apple.draw()
+            self.displayScore()
+            
+            time.sleep(0.1)
+
+    def _isEaten(self):
+        x1, y1 = self.snake.x[0], self.snake.y[0]
+        x2, y2 = self.apple.x, self.apple.y
+        if self.snake.direction == "DOWN":
+            if x1 == x2 and y2 - y1 == 0 : return True
+            else : return False
+        if self.snake.direction == "UP":
+            if x1 == x2 and y1 - (y2 + APPLE_SIZE[0]) == 0 : return True
+            else : return False
+        if self.snake.direction == "LEFT":
+            if y1 == y2 and x1 - (x2 + APPLE_SIZE[0]) == 0 : return True
+            else : return False
+        if self.snake.direction == "RIGHT":
+            if y1 == y2 and x2 - x1 == 0 : return True
+            else : return False
+
+    def eaten(self):
+        self.apple.changeCoords(self.snake)
+        self.snake.length += 1
+        self.snake.getNewCoords()
     
+    def displayScore(self):
+        font = pygame.font.SysFont('arial', 20)
+        score = font.render(f"Score : {self.snake.length - 1}", True, (255, 255, 255))
+        self.screen.blit(score, SCORE_POS)
+        pygame.display.flip()                
+
+
+
 if __name__ == "__main__":
-    s = Snake(
+    s = Game(
         bg_path = 'resources/background.jpg',
         music_path = 'resources/bg_music_1.mp3',
         body_path = 'resources/block.jpg',
-        width = 640,
-        height = 480
+        apple_path = 'resources/apple.jpg',
+        width = SCREEN_WIDTH,
+        height = SCREEN_HEIGHT,
+        length = LENGTH
     )
     s.run()
