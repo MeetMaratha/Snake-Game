@@ -6,7 +6,7 @@ SCREEN_HEIGHT = 680
 SCORE_POS = (SCREEN_WIDTH - 150, 10)
 N_WIDTH = SCREEN_WIDTH // BODY_SIZE[0]
 N_HEIGHT = SCREEN_HEIGHT // BODY_SIZE[0]
-LENGTH = 3
+LENGTH = 1
 BG_POSITION = (0, 0)
 FONT_NAME = 'arial'
 FONT_SIZE = 20
@@ -17,3 +17,12 @@ OVER_COLOR = (255, 0, 0)
 OVER_SCREEN_COLOR = (0, 0, 0)
 TITLE = 'Snake'
 APPLE_START_POS = (400, 400)
+
+class Direction:
+    def __init__(self):
+        self.direction = {
+            0 : "RIGHT",
+            1 : "LEFT",
+            2 : "UP",
+            3 : "DOWN"
+        }
