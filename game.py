@@ -180,28 +180,26 @@ class Game:
                     running = False
                     sys.exit()
             
-            if self._isEaten():
+            if self._isCollision(self.snake.x[0], self.snake.y[0], self.apple.x, self.apple.y):
                 play_sound("ding")
                 self.eaten()
             self.snake.walk(self.background, self.width, self.height, self.apple)
-            self.apple.draw()
+            # self.apple.draw()
             self.displayScore()
             
             time.sleep(0.1)
 
-    def _isEaten(self):
-        x1, y1 = self.snake.x[0], self.snake.y[0]
-        x2, y2 = self.apple.x, self.apple.y
+    def _isCollision(self, x1, y1, x2, y2):
         if self.snake.direction == "DOWN":
             if x1 == x2 and y2 - y1 == 0 : return True
             else : return False
-        if self.snake.direction == "UP":
+        elif self.snake.direction == "UP":
             if x1 == x2 and y1 - (y2 + APPLE_SIZE[0]) == 0 : return True
             else : return False
-        if self.snake.direction == "LEFT":
+        elif self.snake.direction == "LEFT":
             if y1 == y2 and x1 - (x2 + APPLE_SIZE[0]) == 0 : return True
             else : return False
-        if self.snake.direction == "RIGHT":
+        elif self.snake.direction == "RIGHT":
             if y1 == y2 and x2 - x1 == 0 : return True
             else : return False
 
