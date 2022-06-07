@@ -5,12 +5,12 @@ import time
 from config import *
 
 
-def play_sound(name):
+def play_sound(name : str):
         sound = pygame.mixer.Sound(f"resources/{name}.mp3")
         pygame.mixer.Sound.play(sound)
 
 class Snake:
-    def __init__(self, body_path, parent_screen, length):
+    def __init__(self, body_path : str, parent_screen : pygame, length : int):
         self.length = length
         self.body = pygame.transform.scale(pygame.image.load(body_path), BODY_SIZE)
         self.x = [START_POS[0] for _ in range(self.length)]
@@ -19,7 +19,7 @@ class Snake:
         self.parent_screen = parent_screen
         self.direction = "DOWN"
     
-    def draw(self, background, width, height, apple):
+    def draw(self, background : pygame, width : int, height : int , apple):
         
         self.parent_screen.blit(background, (0, 0))
         for i in range(len(self.x)):
@@ -39,14 +39,14 @@ class Snake:
     def moveDown(self):
         self.direction = "DOWN"
     
-    def _isOverlapping(self, new_x, new_y):
+    def _isOverlapping(self, new_x : int, new_y : int):
         for i in range(self.length):
             if self.x[i] == new_x and self.y[i] == new_y:
                 return True
         return False
         
 
-    def _isCrash(self, width, height, direction):
+    def _isCrash(self, width : int, height : int, direction : str):
         if direction == "LEFT":
             if self.x[0] - self.move < 0: return True
             elif self._isOverlapping(self.x[0] - self.move, self.y[0]) : return True
@@ -70,7 +70,7 @@ class Snake:
         else : return False
 
         
-    def walk(self, background, width, height, apple):
+    def walk(self, background : pygame, width : int, height : int, apple):
         if self._isCrash(width, height, self.direction):
             self.displayGameOver()
             play_sound("crash")
@@ -120,12 +120,12 @@ class Snake:
             
 
 class Apple:
-    def __init__(self, apple_path, screen, snake):
+    def __init__(self, apple_path : str, screen : pygame, snake : Snake):
         self.apple_image = pygame.transform.scale(pygame.image.load(apple_path).convert(), BODY_SIZE)
         self.parent_screen = screen
         self.x, self.y = self.getCoords(snake)
 
-    def getCoords(self, snake):
+    def getCoords(self, snake : Snake):
         x = APPLE_SIZE[0] * np.random.randint(N_WIDTH)
         y = APPLE_SIZE[1] * np.random.randint(N_HEIGHT)
         while self.appleInSnake(x, y, snake):
@@ -133,12 +133,12 @@ class Apple:
             y = APPLE_SIZE[1] * np.random.randint(N_HEIGHT)
         return x, y
     
-    def appleInSnake(self, x, y, snake):
+    def appleInSnake(self, x : int, y : int, snake : Snake):
         for i in range(snake.length):
             if snake.x[i] == x and snake.y[i] == y : return True
         return False
 
-    def changeCoords(self, snake):
+    def changeCoords(self, snake : Snake):
         self.x, self.y = self.getCoords(snake)
     
     def draw(self):
@@ -148,7 +148,7 @@ class Apple:
 
 
 class Game:
-    def __init__(self, bg_path, music_path, body_path, apple_path, width, height, length):
+    def __init__(self, bg_path : str, music_path : str, body_path : str, apple_path : str, width : int, height : int, length : int):
         pygame.init()
         pygame.mixer.init()
         self.screen = pygame.display.set_mode((width, height))
@@ -189,7 +189,7 @@ class Game:
             
             time.sleep(0.1)
 
-    def _isCollision(self, x1, y1, x2, y2):
+    def _isCollision(self, x1 : int, y1 : int, x2 : int, y2 : int):
         if self.snake.direction == "DOWN":
             if x1 == x2 and y2 - y1 == 0 : return True
             else : return False
@@ -213,17 +213,3 @@ class Game:
         score = font.render(f"Score : {self.snake.length - 1}", True, (255, 255, 255))
         self.screen.blit(score, SCORE_POS)
         pygame.display.flip()                
-
-
-
-if __name__ == "__main__":
-    s = Game(
-        bg_path = 'resources/background.jpg',
-        music_path = 'resources/bg_music_1.mp3',
-        body_path = 'resources/block.jpg',
-        apple_path = 'resources/apple.jpg',
-        width = SCREEN_WIDTH,
-        height = SCREEN_HEIGHT,
-        length = LENGTH
-    )
-    s.run()
