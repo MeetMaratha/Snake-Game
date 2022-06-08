@@ -1,7 +1,7 @@
 Python Version : 3.10.4
 
 Package            Version
------------------- -----------
+------------------ -----------\n
 asttokens          2.0.5
 backcall           0.2.0
 certifi            2022.5.18.1
