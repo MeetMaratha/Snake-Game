@@ -5,7 +5,7 @@ from snake import Snake
 
 class Apple:
     def __init__(self, snake : Snake):
-        self.apple_Position = APPLE_START_POS
+        self.apple_Position = (APPLE_SIZE[0] * np.random.randint(N_WIDTH), APPLE_SIZE[1] * np.random.randint(N_HEIGHT))
 
     def _appleInSnake(self, x : int ,y : int, snake : Snake):
         for i in range(snake.length):
