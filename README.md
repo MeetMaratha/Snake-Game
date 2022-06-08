@@ -1,13 +1,13 @@
 Python Version : 3.10.4
 
-ipython == 8.4.0
-matplotlib == 3.5.2
-matplotlib-inline == 0.1.3
-numpy == 1.22.4
-pip == 22.1.2
-pygame == 2.1.2
-torch == 1.11.0+cpu
-torchvision == 0.12.0+cpu
+<br>ipython == 8.4.0</br>
+<br>matplotlib == 3.5.2</br>
+<br>matplotlib-inline == 0.1.3</br>
+<br>numpy == 1.22.4</br>
+<br>pip == 22.1.2</br>
+<br>pygame == 2.1.2</br>
+<br>torch == 1.11.0+cpu</br>
+<br>torchvision == 0.12.0+cpu</br>
 
 ## Project Description:
 In this project I created snake game from scratch in which I tried to implement AI Learning. This repository contains two files which can be executed are <b><i>play.py</i></b> which runs the normal snake game where the user can play it and <b><i>run.py</b></i> which are present in folders <b>'Normal Game'</b> and <b>'AI Game'</b> respectively.

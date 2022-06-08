@@ -48,30 +48,6 @@ class GameAI:
         sound = pygame.mixer.Sound(sound_Path)
         pygame.mixer.Sound.play(sound)
 
-    # def run(self, music_Path):
-    #     running = True
-    #     self._playBackgroundMusic(music_Path)
-    #     while running:
-    #         self.frame_Iteration += 1
-    #         time.sleep(0.13)
-    #         self.update(self.snake, self.apple)
-    #         action = self._getActionAI()
-    #         reward = 0
-    #         running = not self._isGameOver()
-    #         if not running or self.frame_Iteration > 100 * self.snake.length:
-    #             reward = OVER_REWARD
-    #             self._closeGame()
-    #         self._setSnakeDirection(action)
-    #         self.snake.move()
-    #         if self._appleEaten():
-    #             self.score += 1
-    #             reward = EATEN_REWARD
-    #             self.snake._increaseSnake()
-    #             self._playSound(self.ding_Path)
-    #             self.apple.apple_Position = self.apple._getCoords(self.snake)
-
-
-
     def update(self, snake, apple):
         font = pygame.font.SysFont(FONT_NAME, FONT_SIZE)
         
@@ -84,21 +60,6 @@ class GameAI:
         self.screen.blit(score, SCORE_POS)
         pygame.display.flip()
     
-    # Removed to make game work using AI
-
-    # def _getAction(self):
-    #     for event in pygame.event.get():
-    #         if event.type == pygame.KEYDOWN:
-    #             if event.key == pygame.K_RIGHT:
-    #                 self.snake._setDirection(0)
-    #             elif event.key == pygame.K_LEFT:
-    #                 self.snake._setDirection(1)
-    #             elif event.key == pygame.K_UP:
-    #                 self.snake._setDirection(2)
-    #             elif event.key == pygame.K_DOWN:
-    #                 self.snake._setDirection(3)
-    #         elif event.type == pygame.QUIT:
-    #             self._closeGame()
 
     def _closeGame(self):
         font = pygame.font.SysFont(FONT_NAME, OVER_SIZE)
