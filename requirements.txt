@@ -28,13 +28,13 @@ pygame==2.5.2
 Pygments==2.18.0
 pyparsing==3.1.2
 python-dateutil==2.9.0.post0
-pytorch-triton-rocm==2.3.0
+pytorch
 six==1.16.0
 stack-data==0.6.3
 sympy==1.12
-torch==2.3.0+rocm6.0
-torchaudio==2.3.0+rocm6.0
-torchvision==0.18.0+rocm6.0
+torch
+torchaudio
+torchvision
 traitlets==5.14.3
 typing_extensions==4.11.0
 wcwidth==0.2.13
